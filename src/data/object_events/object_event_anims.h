@@ -604,9 +604,9 @@ static const union AnimCmd sAnim_BerryTreeStage4[] =
 
 static const union AnimCmd sAnim_NurseBow[] =
 {
-    ANIMCMD_FRAME(0, 8),
-    ANIMCMD_FRAME(9, 32),
-    ANIMCMD_FRAME(0, 8),
+    ANIMCMD_FRAME(0, 1),
+    ANIMCMD_FRAME(9, 4),
+    ANIMCMD_FRAME(0, 1),
     ANIMCMD_END,
 };
 
