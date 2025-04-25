@@ -3,7 +3,6 @@
 #include "battle.h"
 #include "title_screen.h"
 #include "sprite.h"
-#include "gba/m4a_internal.h"
 #include "clear_save_data_menu.h"
 #include "decompress.h"
 #include "event_data.h"
@@ -50,7 +49,6 @@ static void CB2_GoToMainMenu(void);
 static void CB2_GoToClearSaveDataScreen(void);
 static void CB2_GoToResetRtcScreen(void);
 static void CB2_GoToBerryFixScreen(void);
-static void CB2_GoToCopyrightScreen(void);
 static void UpdateLegendaryMarkingColor(u8);
 
 static void SpriteCB_VersionBannerLeft(struct Sprite *sprite);
@@ -757,11 +755,6 @@ static void Task_TitleScreenPhase3(u8 taskId)
             gBattle_BG1_X = 0;
         }
         UpdateLegendaryMarkingColor(gTasks[taskId].tCounter);
-        if ((gMPlayInfo_BGM.status & 0xFFFF) == 0)
-        {
-            BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_WHITEALPHA);
-            SetMainCallback2(CB2_GoToCopyrightScreen);
-        }
     }
 }
 
@@ -769,12 +762,6 @@ static void CB2_GoToMainMenu(void)
 {
     if (!UpdatePaletteFade())
         SetMainCallback2(CB2_InitMainMenu);
-}
-
-static void CB2_GoToCopyrightScreen(void)
-{
-    if (!UpdatePaletteFade())
-        SetMainCallback2(CB2_InitCopyrightScreenAfterTitleScreen);
 }
 
 static void CB2_GoToClearSaveDataScreen(void)

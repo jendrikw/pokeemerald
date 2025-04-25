@@ -280,7 +280,6 @@ void ResetSerial(void);
 u32 LinkMain1(u8 *shouldAdvanceLinkState, u16 *sendCmd, u16 (*recvCmds)[CMD_LENGTH]);
 void LinkVSync(void);
 void Timer3Intr(void);
-void SerialCB(void);
 bool32 InUnionRoom(void);
 void LoadWirelessStatusIndicatorSpriteGfx(void);
 bool8 IsLinkTaskFinished(void);

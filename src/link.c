@@ -160,8 +160,6 @@ static void DequeueRecvCmds(u16 (*recvCmds)[CMD_LENGTH]);
 
 static void StartTransfer(void);
 static bool8 DoHandshake(void);
-static void DoRecv(void);
-static void DoSend(void);
 static void StopTimer(void);
 static void SendRecvDone(void);
 
@@ -2139,179 +2137,9 @@ void Timer3Intr(void)
     StartTransfer();
 }
 
-void SerialCB(void)
-{
-    gLink.localId = SIO_MULTI_CNT->id;
-    switch (gLink.state)
-    {
-        case LINK_STATE_CONN_ESTABLISHED:
-            gLink.hardwareError = SIO_MULTI_CNT->error;
-            DoRecv();
-            DoSend();
-            SendRecvDone();
-            break;
-        case LINK_STATE_HANDSHAKE:
-            if (DoHandshake())
-            {
-                if (gLink.isMaster)
-                {
-                    gLink.state = LINK_STATE_INIT_TIMER;
-                    gLink.serialIntrCounter = 8;
-                }
-                else
-                {
-                    gLink.state = LINK_STATE_CONN_ESTABLISHED;
-                }
-            }
-            break;
-    }
-    gLink.serialIntrCounter++;
-    sNumVBlanksWithoutSerialIntr = 0;
-    if (gLink.serialIntrCounter == 8)
-    {
-        gLastRecvQueueCount = gLink.recvQueue.count;
-    }
-}
-
 static void StartTransfer(void)
 {
     REG_SIOCNT |= SIO_START;
-}
-
-static bool8 DoHandshake(void)
-{
-    u8 i;
-    u8 playerCount;
-    u16 minRecv;
-
-    playerCount = 0;
-    minRecv = 0xFFFF;
-    if (gLink.handshakeAsMaster == TRUE)
-    {
-        REG_SIOMLT_SEND = MASTER_HANDSHAKE;
-    }
-    else
-    {
-        REG_SIOMLT_SEND = SLAVE_HANDSHAKE;
-    }
-    *(u64 *)gLink.handshakeBuffer = REG_SIOMLT_RECV;
-    REG_SIOMLT_RECV = 0;
-    gLink.handshakeAsMaster = FALSE;
-    for (i = 0; i < MAX_LINK_PLAYERS; i++)
-    {
-        if ((gLink.handshakeBuffer[i] & ~0x3) == SLAVE_HANDSHAKE || gLink.handshakeBuffer[i] == MASTER_HANDSHAKE)
-        {
-            playerCount++;
-            if (minRecv > gLink.handshakeBuffer[i] && gLink.handshakeBuffer[i] != 0)
-                minRecv = gLink.handshakeBuffer[i];
-        }
-        else
-        {
-            if (gLink.handshakeBuffer[i] != 0xFFFF)
-                playerCount = 0;
-            break;
-        }
-    }
-    gLink.playerCount = playerCount;
-    if (gLink.playerCount > 1 && gLink.playerCount == sHandshakePlayerCount && gLink.handshakeBuffer[0] == MASTER_HANDSHAKE)
-    {
-        return TRUE;
-    }
-    if (gLink.playerCount > 1)
-    {
-        gLink.link_field_F = (minRecv & 3) + 1;
-    }
-    else
-    {
-        gLink.link_field_F = 0;
-    }
-    sHandshakePlayerCount = gLink.playerCount;
-    return FALSE;
-}
-
-static void DoRecv(void)
-{
-    u16 recv[4];
-    u8 i;
-    u8 index;
-
-    *(u64 *)recv = REG_SIOMLT_RECV;
-    if (gLink.sendCmdIndex == 0)
-    {
-        for (i = 0; i < gLink.playerCount; i++)
-        {
-            if (gLink.checksum != recv[i] && sChecksumAvailable)
-            {
-                gLink.badChecksum = TRUE;
-            }
-        }
-        gLink.checksum = 0;
-        sChecksumAvailable = TRUE;
-    }
-    else
-    {
-        index = gLink.recvQueue.pos + gLink.recvQueue.count;
-        if (index >= QUEUE_CAPACITY)
-        {
-            index -= QUEUE_CAPACITY;
-        }
-        if (gLink.recvQueue.count < QUEUE_CAPACITY)
-        {
-            for (i = 0; i < gLink.playerCount; i++)
-            {
-                gLink.checksum += recv[i];
-                sRecvNonzeroCheck |= recv[i];
-                gLink.recvQueue.data[i][gLink.recvCmdIndex][index] = recv[i];
-            }
-        }
-        else
-        {
-            gLink.queueFull = QUEUE_FULL_RECV;
-        }
-        gLink.recvCmdIndex++;
-        if (gLink.recvCmdIndex == CMD_LENGTH && sRecvNonzeroCheck)
-        {
-            gLink.recvQueue.count++;
-            sRecvNonzeroCheck = 0;
-        }
-    }
-}
-
-static void DoSend(void)
-{
-    if (gLink.sendCmdIndex == CMD_LENGTH)
-    {
-        REG_SIOMLT_SEND = gLink.checksum;
-        if (!sSendBufferEmpty)
-        {
-            gLink.sendQueue.count--;
-            gLink.sendQueue.pos++;
-            if (gLink.sendQueue.pos >= QUEUE_CAPACITY)
-            {
-                gLink.sendQueue.pos = 0;
-            }
-        }
-        else
-        {
-            sSendBufferEmpty = FALSE;
-        }
-    }
-    else
-    {
-        if (!sSendBufferEmpty && gLink.sendQueue.count == 0)
-        {
-            sSendBufferEmpty = TRUE;
-        }
-        if (sSendBufferEmpty)
-        {
-            REG_SIOMLT_SEND = 0;
-        }
-        else
-        {
-            REG_SIOMLT_SEND = gLink.sendQueue.data[gLink.sendCmdIndex][gLink.sendQueue.pos];
-        }
-        gLink.sendCmdIndex++;
-    }
 }
 
 static void StopTimer(void)
@@ -2320,19 +2148,6 @@ static void StopTimer(void)
     {
         REG_TM3CNT_H &= ~TIMER_ENABLE;
         REG_TM3CNT_L = -197;
-    }
-}
-
-static void SendRecvDone(void)
-{
-    if (gLink.recvCmdIndex == CMD_LENGTH)
-    {
-        gLink.sendCmdIndex = 0;
-        gLink.recvCmdIndex = 0;
-    }
-    else if (gLink.isMaster)
-    {
-        REG_TM3CNT_H |= TIMER_ENABLE;
     }
 }
 
