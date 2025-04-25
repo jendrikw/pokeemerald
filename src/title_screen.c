@@ -1,3 +1,4 @@
+#include "gba/isagbprint.h"
 #include "global.h"
 #include "battle.h"
 #include "title_screen.h"
@@ -363,8 +364,8 @@ static const struct CompressedSpriteSheet sPokemonLogoShineSpriteSheet[] =
 // Task data for the main title screen tasks (Task_TitleScreenPhase#)
 #define tCounter    data[0]
 #define tSkipToNext data[1]
-#define tPointless  data[2] // Incremented but never used to do anything.
-#define tBg2Y       data[3]
+#define tPointless  data[2]
+#define tUnused     data[3]
 #define tBg1Y       data[4]
 
 // Sprite data for sVersionBannerLeftSpriteTemplate / sVersionBannerRightSpriteTemplate
@@ -373,33 +374,14 @@ static const struct CompressedSpriteSheet sPokemonLogoShineSpriteSheet[] =
 
 static void SpriteCB_VersionBannerLeft(struct Sprite *sprite)
 {
-    if (gTasks[sprite->sParentTaskId].tSkipToNext)
-    {
-        sprite->oam.objMode = ST_OAM_OBJ_NORMAL;
-        sprite->y = VERSION_BANNER_Y_GOAL;
-    }
-    else
-    {
-        if (sprite->y != VERSION_BANNER_Y_GOAL)
-            sprite->y++;
-        if (sprite->sAlphaBlendIdx != 0)
-            sprite->sAlphaBlendIdx--;
-        SetGpuReg(REG_OFFSET_BLDALPHA, gTitleScreenAlphaBlend[sprite->sAlphaBlendIdx]);
-    }
+    sprite->oam.objMode = ST_OAM_OBJ_NORMAL;
+    sprite->y = VERSION_BANNER_Y_GOAL;
 }
 
 static void SpriteCB_VersionBannerRight(struct Sprite *sprite)
 {
-    if (gTasks[sprite->sParentTaskId].tSkipToNext)
-    {
-        sprite->oam.objMode = ST_OAM_OBJ_NORMAL;
-        sprite->y = VERSION_BANNER_Y_GOAL;
-    }
-    else
-    {
-        if (sprite->y != VERSION_BANNER_Y_GOAL)
-            sprite->y++;
-    }
+    sprite->oam.objMode = ST_OAM_OBJ_NORMAL;
+    sprite->y = VERSION_BANNER_Y_GOAL;
 }
 
 // Sprite data for SpriteCB_PressStartCopyrightBanner
@@ -621,10 +603,8 @@ void CB2_InitTitleScreen(void)
     {
         u8 taskId = CreateTask(Task_TitleScreenPhase1, 0);
 
-        gTasks[taskId].tCounter = 256;
-        gTasks[taskId].tSkipToNext = FALSE;
-        gTasks[taskId].tPointless = -16;
-        gTasks[taskId].tBg2Y = -32;
+        gTasks[taskId].tCounter = 1;
+        gTasks[taskId].tSkipToNext = TRUE;
         gMain.state = 3;
         break;
     }
@@ -634,11 +614,10 @@ void CB2_InitTitleScreen(void)
         gMain.state = 4;
         break;
     case 4:
-        PanFadeAndZoomScreen(DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, 0x100, 0);
         SetGpuReg(REG_OFFSET_BG2X_L, -29 * 256);
         SetGpuReg(REG_OFFSET_BG2X_H, -1);
-        SetGpuReg(REG_OFFSET_BG2Y_L, -32 * 256);
-        SetGpuReg(REG_OFFSET_BG2Y_H, -1);
+        SetGpuReg(REG_OFFSET_BG2Y_L, 0);
+        SetGpuReg(REG_OFFSET_BG2Y_H, 0);
         SetGpuReg(REG_OFFSET_WIN0H, 0);
         SetGpuReg(REG_OFFSET_WIN0V, 0);
         SetGpuReg(REG_OFFSET_WIN1H, 0);
@@ -683,46 +662,26 @@ static void MainCB2(void)
 // Shine the Pokémon logo two more times, and fade in the version banner
 static void Task_TitleScreenPhase1(u8 taskId)
 {
-    // Skip to next phase when A, B, Start, or Select is pressed
-    if (JOY_NEW(A_B_START_SELECT) || gTasks[taskId].tSkipToNext)
-    {
-        gTasks[taskId].tSkipToNext = TRUE;
-        gTasks[taskId].tCounter = 0;
-    }
+    u8 spriteId;
 
-    if (gTasks[taskId].tCounter != 0)
-    {
-        u16 frameNum = gTasks[taskId].tCounter;
-        if (frameNum == 176)
-            StartPokemonLogoShine(SHINE_MODE_DOUBLE);
-        else if (frameNum == 64)
-            StartPokemonLogoShine(SHINE_MODE_SINGLE);
+    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_MODE_1 | DISPCNT_OBJ_1D_MAP | DISPCNT_BG2_ON | DISPCNT_OBJ_ON);
+    SetGpuReg(REG_OFFSET_WININ, 0);
+    SetGpuReg(REG_OFFSET_WINOUT, 0);
+    SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_OBJ | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_ALL);
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
+    SetGpuReg(REG_OFFSET_BLDY, 0);
 
-        gTasks[taskId].tCounter--;
-    }
-    else
-    {
-        u8 spriteId;
+    // Create left side of version banner
+    spriteId = CreateSprite(&sVersionBannerLeftSpriteTemplate, VERSION_BANNER_LEFT_X, VERSION_BANNER_Y, 0);
+    gSprites[spriteId].sAlphaBlendIdx = ARRAY_COUNT(gTitleScreenAlphaBlend);
+    gSprites[spriteId].sParentTaskId = taskId;
 
-        SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_MODE_1 | DISPCNT_OBJ_1D_MAP | DISPCNT_BG2_ON | DISPCNT_OBJ_ON);
-        SetGpuReg(REG_OFFSET_WININ, 0);
-        SetGpuReg(REG_OFFSET_WINOUT, 0);
-        SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_OBJ | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_ALL);
-        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
-        SetGpuReg(REG_OFFSET_BLDY, 0);
+    // Create right side of version banner
+    spriteId = CreateSprite(&sVersionBannerRightSpriteTemplate, VERSION_BANNER_RIGHT_X, VERSION_BANNER_Y, 0);
+    gSprites[spriteId].sParentTaskId = taskId;
 
-        // Create left side of version banner
-        spriteId = CreateSprite(&sVersionBannerLeftSpriteTemplate, VERSION_BANNER_LEFT_X, VERSION_BANNER_Y, 0);
-        gSprites[spriteId].sAlphaBlendIdx = ARRAY_COUNT(gTitleScreenAlphaBlend);
-        gSprites[spriteId].sParentTaskId = taskId;
-
-        // Create right side of version banner
-        spriteId = CreateSprite(&sVersionBannerRightSpriteTemplate, VERSION_BANNER_RIGHT_X, VERSION_BANNER_Y, 0);
-        gSprites[spriteId].sParentTaskId = taskId;
-
-        gTasks[taskId].tCounter = 144;
-        gTasks[taskId].func = Task_TitleScreenPhase2;
-    }
+    gTasks[taskId].tCounter = 1;
+    gTasks[taskId].func = Task_TitleScreenPhase2;
 }
 
 #undef sParentTaskId
@@ -731,15 +690,6 @@ static void Task_TitleScreenPhase1(u8 taskId)
 // Create "Press Start" and copyright banners, and slide Pokémon logo up
 static void Task_TitleScreenPhase2(u8 taskId)
 {
-    u32 yPos;
-
-    // Skip to next phase when A, B, Start, or Select is pressed
-    if (JOY_NEW(A_B_START_SELECT) || gTasks[taskId].tSkipToNext)
-    {
-        gTasks[taskId].tSkipToNext = TRUE;
-        gTasks[taskId].tCounter = 0;
-    }
-
     if (gTasks[taskId].tCounter != 0)
     {
         gTasks[taskId].tCounter--;
@@ -762,15 +712,9 @@ static void Task_TitleScreenPhase2(u8 taskId)
         gTasks[taskId].func = Task_TitleScreenPhase3;
     }
 
-    if (!(gTasks[taskId].tCounter & 3) && gTasks[taskId].tPointless != 0)
-        gTasks[taskId].tPointless++;
-    if (!(gTasks[taskId].tCounter & 1) && gTasks[taskId].tBg2Y != 0)
-        gTasks[taskId].tBg2Y++;
-
     // Slide Pokémon logo up
-    yPos = gTasks[taskId].tBg2Y * 256;
-    SetGpuReg(REG_OFFSET_BG2Y_L, yPos);
-    SetGpuReg(REG_OFFSET_BG2Y_H, yPos / 0x10000);
+    SetGpuReg(REG_OFFSET_BG2Y_L, 0);
+    SetGpuReg(REG_OFFSET_BG2Y_H, 0);
 
     gTasks[taskId].data[5] = 15; // Unused
     gTasks[taskId].data[6] = 6;  // Unused
