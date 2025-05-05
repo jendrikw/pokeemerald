@@ -134,36 +134,32 @@ LittlerootTown_EventScript_StepOffTruckFemale::
 	end
 
 LittlerootTown_EventScript_GoInsideWithMom::
-	delay 15
 	playse SE_LEDGE
-	applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerStepOffTruck
-	waitmovement 0
-	opendoor VAR_0x8004, VAR_0x8005
-	waitdooranim
-	addobject LOCALID_MOM
-	applymovement LOCALID_MOM, LittlerootTown_Movement_MomExitHouse
-	waitmovement 0
-	closedoor VAR_0x8004, VAR_0x8005
-	waitdooranim
-	delay 10
-	applymovement LOCALID_MOM, LittlerootTown_Movement_MomApproachPlayerAtTruck
-	waitmovement 0
-	msgbox LittlerootTown_Text_OurNewHomeLetsGoInside, MSGBOX_DEFAULT
-	closemessage
-	applymovement LOCALID_MOM, LittlerootTown_Movement_MomApproachDoor
-	applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerApproachDoor
-	waitmovement 0
-	opendoor VAR_0x8004, VAR_0x8005
-	waitdooranim
-	applymovement LOCALID_MOM, LittlerootTown_Movement_MomEnterHouse
-	applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerEnterHouse
-	waitmovement 0
-	setflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
-	setvar VAR_LITTLEROOT_INTRO_STATE, 3
-	hideobjectat OBJ_EVENT_ID_PLAYER, 0
-	closedoor VAR_0x8004, VAR_0x8005
-	waitdooranim
-	clearflag FLAG_HIDE_LITTLEROOT_TOWN_FAT_MAN
+	@ applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerStepOffTruck
+	@ waitmovement 0
+	@ opendoor VAR_0x8004, VAR_0x8005
+	@ waitdooranim
+	@ addobject LOCALID_MOM
+	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomExitHouse
+	@ waitmovement 0
+	@ closedoor VAR_0x8004, VAR_0x8005
+	@ waitdooranim
+	@ delay 10
+	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomApproachPlayerAtTruck
+	@ waitmovement 0
+	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomApproachDoor
+	@ applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerApproachDoor
+	@ waitmovement 0
+	@ opendoor VAR_0x8004, VAR_0x8005
+	@ waitdooranim
+	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomEnterHouse
+	@ applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerEnterHouse
+	@ waitmovement 0
+	@ setflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
+	@ setvar VAR_LITTLEROOT_INTRO_STATE, 3
+	@ hideobjectat OBJ_EVENT_ID_PLAYER, 0
+	@ closedoor VAR_0x8004, VAR_0x8005
+	@ waitdooranim
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	return
 
@@ -433,18 +429,6 @@ LittlerootTown_EventScript_PlayersHouseSignFemale::
 
 LittlerootTown_EventScript_Mom::
 	end
-
-LittlerootTown_Text_OurNewHomeLetsGoInside:
-	.string "MOM: {PLAYER}, we're here, honey!\p"
-	.string "It must be tiring riding with our things\n"
-	.string "in the moving truck.\p"
-	.string "Well, this is LITTLEROOT TOWN.\p"
-	.string "How do you like it?\n"
-	.string "This is our new home!\p"
-	.string "It has a quaint feel, but it seems to be\n"
-	.string "an easy place to live, don't you think?\p"
-	.string "And, you get your own room, {PLAYER}!\n"
-	.string "Let's go inside.$"
 
 LittlerootTown_Text_CanUsePCToStoreItems:
 	.string "If you use a PC, you can store items\n"
