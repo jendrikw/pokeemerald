@@ -1,3 +1,4 @@
+#include "gba/isagbprint.h"
 #include "global.h"
 #include "task.h"
 
@@ -24,7 +25,7 @@ void ResetTasks(void)
     gTasks[NUM_TASKS - 1].next = TAIL_SENTINEL;
 }
 
-u8 CreateTask(TaskFunc func, u8 priority)
+u8 (CreateTask)(TaskFunc func, u8 priority)
 {
     u8 i;
 
