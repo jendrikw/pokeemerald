@@ -42,7 +42,7 @@ LittlerootTown_MapScripts::
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
 	call Common_EventScript_SetupRivalGfxId
-	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
+	@ call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
 	call_if_unset FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_SetTwinPos
 	call_if_eq VAR_LITTLEROOT_HOUSES_STATE_MAY, 3, LittlerootTown_EventScript_SetExitedHouseAfterLatiSSTicketEvent
 	call_if_eq VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 3, LittlerootTown_EventScript_SetExitedHouseAfterLatiSSTicketEvent
@@ -74,12 +74,12 @@ LittlerootTown_EventScript_SetExitedHouseAfterLatiSSTicketEvent::
 	setvar VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 5
 	return
 
-LittlerootTown_EventScript_MoveMomToMaysDoor::
-	setobjectxyperm LOCALID_MOM, 14, 8
-	return
+@ LittlerootTown_EventScript_MoveMomToMaysDoor::
+@ 	setobjectxyperm LOCALID_MOM, 14, 8
+@ 	return
 
 LittlerootTown_EventScript_SetTwinPos::
-	goto_if_eq VAR_LITTLEROOT_TOWN_STATE, 0, LittlerootTown_EventScript_SetTwinGuardingRoutePos
+	@ goto_if_eq VAR_LITTLEROOT_TOWN_STATE, 0, LittlerootTown_EventScript_SetTwinGuardingRoutePos
 	setobjectxyperm LOCALID_TWIN, 10, 1
 	setobjectmovementtype LOCALID_TWIN, MOVEMENT_TYPE_FACE_UP
 	return
@@ -89,118 +89,72 @@ LittlerootTown_EventScript_SetTwinGuardingRoutePos::
 	setobjectmovementtype LOCALID_TWIN, MOVEMENT_TYPE_FACE_DOWN
 	return
 
-LittlerootTown_EventScript_SetMomStandingInFrontOfDoorPos::
-	clearflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
-	setobjectmovementtype LOCALID_MOM, MOVEMENT_TYPE_FACE_DOWN
-	checkplayergender
-	call_if_eq VAR_RESULT, MALE, LittlerootTown_EventScript_SetMomInFrontOfDoorMale
-	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_EventScript_SetMomInFrontOfDoorFemale
-	return
+@ LittlerootTown_EventScript_SetMomStandingInFrontOfDoorPos::
+@ 	clearflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
+@ 	setobjectmovementtype LOCALID_MOM, MOVEMENT_TYPE_FACE_DOWN
+@ 	checkplayergender
+@ 	call_if_eq VAR_RESULT, MALE, LittlerootTown_EventScript_SetMomInFrontOfDoorMale
+@ 	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_EventScript_SetMomInFrontOfDoorFemale
+@ 	return
 
-LittlerootTown_EventScript_SetMomInFrontOfDoorMale::
-	setobjectxyperm LOCALID_MOM, 5, 9
-	return
+@ LittlerootTown_EventScript_SetMomInFrontOfDoorMale::
+@ 	setobjectxyperm LOCALID_MOM, 5, 9
+@ 	return
 
-LittlerootTown_EventScript_SetMomInFrontOfDoorFemale::
-	setobjectxyperm LOCALID_MOM, 14, 9
-	return
+@ LittlerootTown_EventScript_SetMomInFrontOfDoorFemale::
+@ 	setobjectxyperm LOCALID_MOM, 14, 9
+@ 	return
 
 LittlerootTown_OnFrame:
-	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 1, LittlerootTown_EventScript_StepOffTruckMale
-	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_StepOffTruckFemale
+	@ map_script_2 VAR_LITTLEROOT_INTRO_STATE, 1, LittlerootTown_EventScript_StepOffTruckMale
+	@ map_script_2 VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_StepOffTruckFemale
 	map_script_2 VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_BeginDexUpgradeScene
 	.2byte 0
 
-LittlerootTown_EventScript_StepOffTruckMale::
-	lockall
-	setvar VAR_0x8004, 5
-	setvar VAR_0x8005, 8
-	call LittlerootTown_EventScript_GoInsideWithMom
-	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_TRUCK
-	warpsilent MAP_LITTLEROOT_TOWN_BRENDANS_HOUSE_1F, 8, 8
-	waitstate
-	releaseall
-	end
+@ LittlerootTown_EventScript_GoInsideWithMom::
+@ 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
+@ 	setvar VAR_LITTLEROOT_INTRO_STATE, 3
+@ 	clearflag FLAG_HIDE_MAP_NAME_POPUP
+@ 	return
 
-LittlerootTown_EventScript_StepOffTruckFemale::
-	lockall
-	setvar VAR_0x8004, 14
-	setvar VAR_0x8005, 8
-	call LittlerootTown_EventScript_GoInsideWithMom
-	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_TRUCK
-	warpsilent MAP_LITTLEROOT_TOWN_MAYS_HOUSE_1F, 2, 8
-	waitstate
-	releaseall
-	end
+@ LittlerootTown_Movement_MomExitHouse:
+@ 	walk_down
+@ 	step_end
 
-LittlerootTown_EventScript_GoInsideWithMom::
-	playse SE_LEDGE
-	@ applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerStepOffTruck
-	@ waitmovement 0
-	@ opendoor VAR_0x8004, VAR_0x8005
-	@ waitdooranim
-	@ addobject LOCALID_MOM
-	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomExitHouse
-	@ waitmovement 0
-	@ closedoor VAR_0x8004, VAR_0x8005
-	@ waitdooranim
-	@ delay 10
-	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomApproachPlayerAtTruck
-	@ waitmovement 0
-	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomApproachDoor
-	@ applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerApproachDoor
-	@ waitmovement 0
-	@ opendoor VAR_0x8004, VAR_0x8005
-	@ waitdooranim
-	@ applymovement LOCALID_MOM, LittlerootTown_Movement_MomEnterHouse
-	@ applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PlayerEnterHouse
-	@ waitmovement 0
-	@ setflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
-	@ setvar VAR_LITTLEROOT_INTRO_STATE, 3
-	@ hideobjectat OBJ_EVENT_ID_PLAYER, 0
-	@ closedoor VAR_0x8004, VAR_0x8005
-	@ waitdooranim
-	clearflag FLAG_HIDE_MAP_NAME_POPUP
-	return
+@ LittlerootTown_Movement_MomApproachPlayerAtTruck:
+@ 	walk_down
+@ 	walk_in_place_faster_left
+@ 	step_end
 
-LittlerootTown_Movement_MomExitHouse:
-	walk_down
-	step_end
+@ LittlerootTown_Movement_MomApproachDoor:
+@ 	delay_16
+@ 	delay_8
+@ 	walk_up
+@ 	step_end
 
-LittlerootTown_Movement_MomApproachPlayerAtTruck:
-	walk_down
-	walk_in_place_faster_left
-	step_end
+@ LittlerootTown_Movement_MomEnterHouse:
+@ 	walk_up
+@ 	set_invisible
+@ 	step_end
 
-LittlerootTown_Movement_MomApproachDoor:
-	delay_16
-	delay_8
-	walk_up
-	step_end
+@ LittlerootTown_Movement_PlayerApproachDoor:
+@ 	delay_16
+@ 	delay_8
+@ 	walk_right
+@ 	walk_in_place_faster_up
+@ 	step_end
 
-LittlerootTown_Movement_MomEnterHouse:
-	walk_up
-	set_invisible
-	step_end
+@ LittlerootTown_Movement_PlayerEnterHouse:
+@ 	walk_up
+@ 	walk_up
+@ 	step_end
 
-LittlerootTown_Movement_PlayerApproachDoor:
-	delay_16
-	delay_8
-	walk_right
-	walk_in_place_faster_up
-	step_end
-
-LittlerootTown_Movement_PlayerEnterHouse:
-	walk_up
-	walk_up
-	step_end
-
-LittlerootTown_Movement_PlayerStepOffTruck:
-	jump_right
-	delay_16
-	delay_16
-	delay_16
-	step_end
+@ LittlerootTown_Movement_PlayerStepOffTruck:
+@ 	jump_right
+@ 	delay_16
+@ 	delay_16
+@ 	delay_16
+@ 	step_end
 
 LittlerootTown_EventScript_BeginDexUpgradeScene::
 	lockall
@@ -255,7 +209,7 @@ LittlerootTown_EventScript_Twin::
 	goto_if_set FLAG_ADVENTURE_STARTED, LittlerootTown_EventScript_GoodLuck
 	goto_if_set FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_YouSavedBirch
 	goto_if_ne VAR_LITTLEROOT_TOWN_STATE, 0, LittlerootTown_EventScript_GoSaveBirch
-	msgbox LittlerootTown_Text_IfYouGoInGrassPokemonWillJumpOut, MSGBOX_DEFAULT
+	@ msgbox LittlerootTown_Text_IfYouGoInGrassPokemonWillJumpOut, MSGBOX_DEFAULT
 	release
 	end
 
@@ -280,97 +234,97 @@ LittlerootTown_EventScript_GoodLuck::
 	release
 	end
 
-LittlerootTown_EventScript_NeedPokemonTriggerLeft::
-	lockall
-	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinApproachPlayerLeft
-	waitmovement 0
-	call LittlerootTown_EventScript_DangerousWithoutPokemon
-	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinReturnLeft
-	waitmovement 0
-	releaseall
-	end
+@ LittlerootTown_EventScript_NeedPokemonTriggerLeft::
+@ 	lockall
+@ 	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinApproachPlayerLeft
+@ 	waitmovement 0
+@ 	call LittlerootTown_EventScript_DangerousWithoutPokemon
+@ 	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinReturnLeft
+@ 	waitmovement 0
+@ 	releaseall
+@ 	end
 
-LittlerootTown_EventScript_DangerousWithoutPokemon::
-	msgbox LittlerootTown_Text_IfYouGoInGrassPokemonWillJumpOut, MSGBOX_DEFAULT
-	closemessage
-	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinPushPlayerFromRoute
-	applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PushPlayerBackFromRoute
-	waitmovement 0
-	msgbox LittlerootTown_Text_DangerousIfYouDontHavePokemon, MSGBOX_DEFAULT
-	closemessage
-	return
+@ LittlerootTown_EventScript_DangerousWithoutPokemon::
+@ 	msgbox LittlerootTown_Text_IfYouGoInGrassPokemonWillJumpOut, MSGBOX_DEFAULT
+@ 	closemessage
+@ 	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinPushPlayerFromRoute
+@ 	applymovement OBJ_EVENT_ID_PLAYER, LittlerootTown_Movement_PushPlayerBackFromRoute
+@ 	waitmovement 0
+@ 	msgbox LittlerootTown_Text_DangerousIfYouDontHavePokemon, MSGBOX_DEFAULT
+@ 	closemessage
+@ 	return
 
-LittlerootTown_Movement_TwinApproachPlayerLeft:
-	face_right
-	delay_8
-	disable_jump_landing_ground_effect
-	jump_in_place_right
-	delay_8
-	walk_fast_right
-	walk_fast_right
-	walk_fast_right
-	walk_fast_right
-	walk_fast_up
-	walk_fast_up
-	walk_fast_left
-	face_down
-	step_end
+@ LittlerootTown_Movement_TwinApproachPlayerLeft:
+@ 	face_right
+@ 	delay_8
+@ 	disable_jump_landing_ground_effect
+@ 	jump_in_place_right
+@ 	delay_8
+@ 	walk_fast_right
+@ 	walk_fast_right
+@ 	walk_fast_right
+@ 	walk_fast_right
+@ 	walk_fast_up
+@ 	walk_fast_up
+@ 	walk_fast_left
+@ 	face_down
+@ 	step_end
 
-LittlerootTown_Movement_TwinPushPlayerFromRoute:
-	walk_down
-	step_end
+@ LittlerootTown_Movement_TwinPushPlayerFromRoute:
+@ 	walk_down
+@ 	step_end
 
-LittlerootTown_Movement_TwinReturnLeft:
-	walk_right
-	walk_down
-	walk_down
-	walk_left
-	walk_left
-	walk_left
-	walk_left
-	walk_up
-	walk_in_place_faster_down
-	step_end
+@ LittlerootTown_Movement_TwinReturnLeft:
+@ 	walk_right
+@ 	walk_down
+@ 	walk_down
+@ 	walk_left
+@ 	walk_left
+@ 	walk_left
+@ 	walk_left
+@ 	walk_up
+@ 	walk_in_place_faster_down
+@ 	step_end
 
-LittlerootTown_Movement_PushPlayerBackFromRoute:
-	lock_facing_direction
-	walk_down
-	unlock_facing_direction
-	step_end
+@ LittlerootTown_Movement_PushPlayerBackFromRoute:
+@ 	lock_facing_direction
+@ 	walk_down
+@ 	unlock_facing_direction
+@ 	step_end
 
-LittlerootTown_EventScript_NeedPokemonTriggerRight::
-	lockall
-	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinApproachPlayerRight
-	waitmovement 0
-	call LittlerootTown_EventScript_DangerousWithoutPokemon
-	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinReturnRight
-	waitmovement 0
-	releaseall
-	end
+@ LittlerootTown_EventScript_NeedPokemonTriggerRight::
+@ 	lockall
+@ 	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinApproachPlayerRight
+@ 	waitmovement 0
+@ 	call LittlerootTown_EventScript_DangerousWithoutPokemon
+@ 	applymovement LOCALID_TWIN, LittlerootTown_Movement_TwinReturnRight
+@ 	waitmovement 0
+@ 	releaseall
+@ 	end
 
-LittlerootTown_Movement_TwinApproachPlayerRight:
-	face_right
-	delay_8
-	disable_jump_landing_ground_effect
-	jump_in_place_right
-	delay_8
-	walk_fast_right
-	walk_fast_right
-	walk_fast_right
-	walk_fast_up
-	walk_fast_up
-	walk_fast_right
-	face_down
-	step_end
+@ LittlerootTown_Movement_TwinApproachPlayerRight:
+@ 	face_right
+@ 	delay_8
+@ 	disable_jump_landing_ground_effect
+@ 	jump_in_place_right
+@ 	delay_8
+@ 	walk_fast_right
+@ 	walk_fast_right
+@ 	walk_fast_right
+@ 	walk_fast_up
+@ 	walk_fast_up
+@ 	walk_fast_right
+@ 	face_down
+@ 	step_end
 
-LittlerootTown_Movement_TwinReturnRight:
-	walk_left
-	walk_down
-	walk_left
-	walk_left
-	walk_left
-	walk_in_place_faster_down
-	step_end
+@ LittlerootTown_Movement_TwinReturnRight:
+@ 	walk_left
+@ 	walk_down
+@ 	walk_left
+@ 	walk_left
+@ 	walk_left
+@ 	walk_in_place_faster_down
+@ 	step_end
 
 LittlerootTown_EventScript_GoSaveBirchTrigger::
 	lockall
@@ -442,21 +396,7 @@ LittlerootTown_Text_BirchSpendsDaysInLab:
 	.string "When does PROF. BIRCH spend time\n"
 	.string "at home?$"
 
-LittlerootTown_Text_IfYouGoInGrassPokemonWillJumpOut:
-	.string "Um, um, um!\p"
-	.string "If you go outside and go in the grass,\n"
-	.string "wild POKéMON will jump out!$"
-
-LittlerootTown_Text_DangerousIfYouDontHavePokemon:
-	.string "It's dangerous if you don't have\n"
-	.string "your own POKéMON.$"
-
 LittlerootTown_Text_CanYouGoSeeWhatsHappening:
-	.string "Um, hi!\p"
-	.string "There are scary POKéMON outside!\n"
-	.string "I can hear their cries!\p"
-	.string "I want to go see what's going on,\n"
-	.string "but I don't have any POKéMON…\p"
 	.string "Can you go see what's happening\n"
 	.string "for me?$"
 

@@ -1,3 +1,4 @@
+#include "constants/vars.h"
 #include "global.h"
 #include "new_game.h"
 #include "random.h"
@@ -126,7 +127,7 @@ static void ClearFrontierRecord(void)
 
 static void WarpToTruck(void)
 {
-    SetWarpDestination(MAP_GROUP(INSIDE_OF_TRUCK), MAP_NUM(INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
+    SetWarpDestination(MAP_GROUP(LITTLEROOT_TOWN), MAP_NUM(LITTLEROOT_TOWN), WARP_ID_NONE, 10, 8);
     WarpIntoMap();
 }
 
@@ -206,6 +207,23 @@ void NewGameInitData(void)
     ResetContestLinkResults();
     FlagSet(FLAG_SYS_B_DASH);
     FlagSet(FLAG_RECEIVED_RUNNING_SHOES);
+    FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_TRUCK);
+    FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_TRUCK);
+    FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_MOM);
+    FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_TRUCK);
+    VarSet(VAR_LITTLEROOT_TOWN_STATE, 2);
+    if (gSaveBlock2Ptr->playerGender == MALE) {
+        FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_RIVAL_MOM);
+        FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_RIVAL_SIBLING);
+        FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F_POKE_BALL);
+        VarSet(VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 1);
+    } else {
+        FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_RIVAL_MOM);
+        FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_RIVAL_SIBLING);
+        FlagSet(FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_2F_POKE_BALL);
+        VarSet(VAR_LITTLEROOT_HOUSES_STATE_MAY, 1);
+    }
+	
 }
 
 static void ResetMiniGamesRecords(void)

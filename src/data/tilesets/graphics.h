@@ -820,28 +820,6 @@ const u32 gTilesetTiles_SecretBaseBlueCave[] = INCBIN_U32("data/tilesets/seconda
 const u32 gTilesetTiles_SecretBaseYellowCave[] = INCBIN_U32("data/tilesets/secondary/secret_base/yellow_cave/tiles.4bpp");
 const u32 gTilesetTiles_SecretBaseRedCave[] = INCBIN_U32("data/tilesets/secondary/secret_base/red_cave/tiles.4bpp");
 
-const u32 gTilesetTiles_InsideOfTruck[] = INCBIN_U32("data/tilesets/secondary/inside_of_truck/tiles.4bpp.lz");
-
-const u16 gTilesetPalettes_InsideOfTruck[][16] =
-{
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/00.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/01.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/02.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/03.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/04.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/05.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/06.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/07.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/08.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/09.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/10.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/11.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/12.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/13.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/14.gbapal"),
-	INCBIN_U16("data/tilesets/secondary/inside_of_truck/palettes/15.gbapal"),
-};
-
 const u32 gTilesetTiles_Contest[] = INCBIN_U32("data/tilesets/secondary/contest/tiles.4bpp.lz");
 
 const u16 gTilesetPalettes_Contest[][16] =

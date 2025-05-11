@@ -415,18 +415,6 @@ const struct Tileset gTileset_SecretBaseRedCave =
     .metatileAttributes = gMetatileAttributes_SecretBaseSecondary,
     .callback = NULL,
 };
-
-const struct Tileset gTileset_InsideOfTruck =
-{
-    .isCompressed = TRUE,
-    .isSecondary = TRUE,
-    .tiles = gTilesetTiles_InsideOfTruck,
-    .palettes = gTilesetPalettes_InsideOfTruck,
-    .metatiles = gMetatiles_InsideOfTruck,
-    .metatileAttributes = gMetatileAttributes_InsideOfTruck,
-    .callback = NULL,
-};
-
 const struct Tileset gTileset_Unused2 =
 {
     .isCompressed = TRUE,
